@@ -160,8 +160,8 @@ def train_model(symbol: str, timeframe: str = "4h"):
         # אימון
         history = model.fit(X, y, batch_size=32, epochs=10, validation_split=0.1, verbose=0)
 
-        # שמירה
-        model_filename = f"{symbol.lower()}_lstm_model.h5"
+        # שמירה (מוסיפים את טווח הזמן לשם הקובץ)
+        model_filename = f"{symbol.lower()}_{timeframe}_lstm_model.h5"
         model.save(model_filename)
 
         final_loss = history.history['loss'][-1]
@@ -185,7 +185,8 @@ def train_model(symbol: str, timeframe: str = "4h"):
 # ==========================================
 @app.get("/api/ai/predict/{symbol}")
 def predict_next_price(symbol: str, timeframe: str = "4h"):
-    model_filename = f"{symbol.lower()}_lstm_model.h5"
+    # טוען את המודל הספציפי לפי טווח הזמן שביקשו
+    model_filename = f"{symbol.lower()}_{timeframe}_lstm_model.h5"
 
     if not os.path.exists(model_filename):
         raise HTTPException(status_code=404, detail=f"Model for {symbol} not found. Please train first.")
